@@ -7,6 +7,9 @@ host=mingw
 objsuffix=.o
  #.o or .obj
 
+libsuffix=.a
+ #.a or .lib
+
 exesuffix=.exe
  #.exe or (none)
 
@@ -16,16 +19,33 @@ fe=-o
 fo=-o
  #-o or /Fo
 
-CXXFLAGS = -I. -DHAS_CXX0X_MEMORY
+CXXFLAGS = -I. -g
 LINK = $(CXX)
-LINKFLAGS = $(CXXFLAGS)
+LINKFLAGS = $(CXXFLAGS) -Wl,--enable-auto-import
 TARGET = git$(exesuffix)
-OBJS = $(addsuffix $(objsuffix), modern-git compat/$(host))
+MAINOBJS = modern-git
+COMPATOBJS = $(host)
+TESTOBJS = ustring_test
 
-.PHONY: all clean
+OBJS = $(addsuffix $(objsuffix), $(MAINOBJS) $(addprefix compat/, $(COMPATOBJS)))
+TESTS = $(addsuffix $(objsuffix), $(addprefix testsuite/, $(TESTOBJS)))
+OBJLIB = gitobjs$(libsuffix)
+
+.PHONY: all clean test
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(LINK) $(LINKFLAGS) $(fe) $@ $^
 
+$(OBJLIB): $(OBJS)
+	$(AR) rc $@ $^
+
+test: testsuite/unittest$(exesuffix)
+	$<
+
+testsuite/unittest$(exesuffix): $(TESTS) $(OBJLIB)
+	$(LINK) $(LINKFLAGS) $(fe) $@ $^
+
+clean:
+	-$(RM) $(TARGET) $(TESTS) $(OBJLIB) $(OBJS)
