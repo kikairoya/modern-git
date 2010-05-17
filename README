@@ -1,0 +1,5 @@
+'modern-git' is a modern implementation of Git in C++.
+The main motivation is correct handling of file-name
+encoded in CP932, EUC-* or UTF-8 etc. 
+The main contributor will be @kikairoya and @bleis.
+This project is licensed by GPL v2 or later.
