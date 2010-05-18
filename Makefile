@@ -19,11 +19,13 @@ fe=-o
 fo=-o
  #-o or /Fo
 
-CXXFLAGS = -I. -g
+MAKEDEP=$(CXX) -E -MM $(CXXFLAGS)
+
+CXXFLAGS = -I. -g -Wall
 LINK = $(CXX)
 LINKFLAGS = $(CXXFLAGS) -Wl,--enable-auto-import
 TARGET = git$(exesuffix)
-MAINOBJS = modern-git
+MAINOBJS = modern-git environment
 COMPATOBJS = $(host)
 TESTOBJS = ustring_test
 
@@ -33,6 +35,10 @@ OBJLIB = gitobjs$(libsuffix)
 
 .PHONY: all clean test
 
+ifneq ($(MAKECMDGOALS),clean)
+-include $(OBJS:$(objsuffix)=.dep)
+endif
+
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
@@ -41,6 +47,13 @@ $(TARGET): $(OBJS)
 $(OBJLIB): $(OBJS)
 	$(AR) rc $@ $^
 
+%.dep: %.cc
+	echo $@ \\ > $@
+	$(MAKEDEP) $< >> $@
+
+%.o: %.cc %.dep
+	$(CXX) $(CXXFLAGS) -c $(fo) $@ $<
+
 test: testsuite/unittest$(exesuffix)
 	$<
 
@@ -48,4 +61,4 @@ testsuite/unittest$(exesuffix): $(TESTS) $(OBJLIB)
 	$(LINK) $(LINKFLAGS) $(fe) $@ $^
 
 clean:
-	-$(RM) $(TARGET) $(TESTS) $(OBJLIB) $(OBJS)
+	-$(RM) $(TARGET) $(TESTS) $(OBJLIB) $(OBJS) $(OBJS:$(objsuffix)=.dep)

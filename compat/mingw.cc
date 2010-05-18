@@ -1,5 +1,6 @@
 #include <windows.h>
 #include "git-compat-util.hpp"
+#include "path.hpp"
 
 #include <stdexcept>
 
@@ -32,4 +33,51 @@ namespace mgit {
 		return conv_from_utf16(conv_to_utf16(utf8_str.str_, CP_UTF8), CP_ACP);
 	}
 
+	std::wstring ustring::conv_to_u16(const std::string &host_str) {
+		return conv_to_utf16(host_str, CP_ACP);
+	}
+
+	std::wstring ustring::conv_to_u16(const ustring &utf8_str) {
+		return conv_to_utf16(utf8_str.str_, CP_UTF8);
+	}
+
+	namespace fsutil {
+		ustring get_temporary_name(const ustring &where, const ustring &prefix, bool create) {
+			char buf[MAX_PATH];
+			if (GetTempFileNameA(where.a_str().c_str(), prefix.a_str().c_str(), 0, buf)) {
+				if (!create) DeleteFileA(buf);
+				return ustring(buf);
+			} else {
+				throw std::runtime_error("cannot create temporary file name at " + where.a_str() + '\\' + prefix.a_str() + "XXXX.TMP");
+			}
+		}
+		bool symlink_usable(const ustring &where) {
+			const ustring trgname = get_temporary_name(where, "tht", true);
+			const ustring lnkname = get_temporary_name(where, "thl");
+			HMODULE h = GetModuleHandle("kernel32.dll");
+			typedef BOOL (*T)(LPCWSTR, LPCWSTR, LPVOID);
+			T pCreateSymbolicLinkW = (T)GetProcAddress(h, "CreateSymbolicLinkW");
+			if (pCreateSymbolicLinkW && pCreateSymbolicLinkW(lnkname.w_str().c_str(), trgname.w_str().c_str(), NULL)) {
+				DeleteFileW(lnkname.w_str().c_str());
+				DeleteFileW(trgname.w_str().c_str());
+				return true;
+			}
+			return false;
+		}
+		bool hardlink_usable(const ustring &where) {
+			const ustring trgname = get_temporary_name(where, "tht", true);
+			const ustring lnkname = get_temporary_name(where, "thl");
+			HMODULE h = GetModuleHandleA("kernel32.dll");
+			typedef BOOL (*T)(LPCWSTR, LPCWSTR, LPVOID);
+			T pCreateHardLinkW = (T)GetProcAddress(h, "CreateHardLinkW");
+			if (pCreateHardLinkW && pCreateHardLinkW(lnkname.w_str().c_str(), trgname.w_str().c_str(), NULL)) {
+				DeleteFileW(lnkname.w_str().c_str());
+				DeleteFileW(trgname.w_str().c_str());
+				return true;
+			}
+			return false;
+		}
+		bool unix_perm_usable(const ustring &) { return false; }
+		bool ignore_case_path(const ustring &) { return false; }
+	}
 }

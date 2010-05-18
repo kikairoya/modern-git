@@ -2,6 +2,7 @@
 *.lib
 *.o
 *.obj
+*.dep
 *.exe
 *.exe.stackdump
 *~
