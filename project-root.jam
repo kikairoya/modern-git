@@ -1,0 +1,4 @@
+import modules ;
+
+path-constant BOOST_ROOT : [ modules.peek : BOOST_ROOT ] ;
+use-project /boost : $(BOOST_ROOT) ;

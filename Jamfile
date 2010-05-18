@@ -1,0 +1,47 @@
+import testing ;
+
+rule suppress-warnings ( properties * )
+{
+    local vc-ver = [
+        MATCH "^<toolset-msvc:version>([0-9]+)[.]" : $(properties)
+    ] ;
+    if $(vc-ver) && $(vc-ver) >= 8
+    {
+        return <cxxflags>-wd4819 <cxxflags>-wd4996 ;
+    }
+}
+
+project mgit
+    : requirements
+      <library>/boost//headers
+      <conditional>@suppress-warnings
+      <define>BOOST_ALL_NO_LIB=1
+      <include>.
+    : build-dir bin
+    ;
+
+lib gitobjs
+    :
+    [ GLOB . : *.cc ]
+    compat/mingw.cc
+    :
+    <link>static
+    ;
+
+local test_sources = [ GLOB testsuite : *.cc ] ;
+local test_names = $(test_sources:B) ;
+for name in $(test_names)
+{
+    run testsuite/$(name).cc
+        gitobjs
+        :
+        :
+        :
+        <library>/boost/system//boost_system
+        :
+        $(name)
+        ;
+    explicit $(name) ;
+}
+
+alias test : $(test_names) ;
