@@ -1,4 +1,7 @@
+*.a
+*.lib
 *.o
+*.obj
 *.exe
 *.exe.stackdump
 *~

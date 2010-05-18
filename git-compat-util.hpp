@@ -32,20 +32,54 @@ namespace mgit {
 
 	/** @brief a main string type of internal use
 	 *
-	 * ustring's encoding is always utf-8. std::string's is host's locale.
+	 * Ustring's encoding is always utf-8. std::string's is host's locale.
+	 * To avoid implicitly confusing encode, I think this class would be immutable.
 	 **/
 	class ustring {
 	public:
-		ustring(): str_() { }
+		// Default ctor with empty string, but ustring is immutable...
+		//ustring(): str_() { }
+		
+		/// Construct from host's encoding string. Is this need explicit ?
 		ustring(const std::string &host_str): str_(conv_to_u8(host_str)) { }
+		
+		/// same for usablility.
 		ustring(const char *host_str): str_(conv_to_u8(host_str)) { }
+		
+		/// Construct from utf-8 string. 2nd argument is dummy.
+		ustring(const std::string &u8_str, int): str_(u8_str) { }
+		
+		/// Copy constructor
+		ustring(const ustring &other): str_(other.str_) { }
+		
+		/// Copy assignment operator
+		ustring &operator =(const ustring &other) { str_ = other.str_; }
+		
+		// Implicit conversion to host's encoding, but I think this should be disabled.
 		// operator std::string() const { return conv_from_u8(*this); }
+		
+		/// Get a string by host's encoding.
 		std::string a_str() const { return conv_from_u8(*this); }
+		
+		/// Get a byte-stream with utf-8 encoding.
 		const char *u_str() const { return str_.c_str(); }
+		
+		/// Get length in utf-8 encoding.
 		size_t length() const { return str_.length(); }
+		
+		/// Tell string is empty.
 		bool empty() const { return str_.empty(); }
-		friend const ustring operator +(const ustring &x, const ustring &y) { return x.str_ + y.str_; }
+		
+		/// Concat two utf-8 strings.
+		friend const ustring operator +(const ustring &x, const ustring &y) { return ustring(x.str_ + y.str_, 0); }
+		
+		/// Compare two utf-8 strings.
+		friend bool operator ==(const ustring &x, const ustring &y) { return x.str_ == y.str_; }
+		friend bool operator !=(const ustring &x, const ustring &y) { return x.str_ != y.str_; }
+		
+		/// Stream output with utf-8 encoding. I don't know we need this operator...
 		friend std::ostream &operator <<(std::ostream &os, const ustring &s) { return os << s.str_; }
+		
 	private:
 		static std::string conv_to_u8(const std::string &host_str);
 		static std::string conv_from_u8(const ustring &utf8_str);
