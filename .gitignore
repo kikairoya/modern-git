@@ -6,3 +6,4 @@
 *.exe
 *.exe.stackdump
 *~
+bin/

@@ -13,10 +13,13 @@ rule suppress-warnings ( properties * )
 
 project mgit
     : requirements
+      <link>shared:<define>BOOST_TEST_DYN_LINK=1
       <library>/boost//headers
       <conditional>@suppress-warnings
       <define>BOOST_ALL_NO_LIB=1
       <include>.
+    : usage-requirements
+      <define>BOOST_TEST_NO_AUTO_LINK=1
     : build-dir bin
     ;
 
@@ -38,6 +41,7 @@ for name in $(test_names)
         :
         :
         <library>/boost/system//boost_system
+        <library>/boost/test//boost_unit_test_framework
         :
         $(name)
         ;
