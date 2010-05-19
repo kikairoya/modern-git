@@ -48,13 +48,12 @@ namespace mgit {
 		ustring(): str_() { }
 
 		/// Construct from host's encoding string. Is this need explicit ?
-		ustring(const std::string &host_str): str_(conv_to_u8(host_str)) { }
+		ustring(const std::string &str, encoding src_enc = enc_host_native)
+			 : str_(src_enc==enc_host_native ? conv_to_u8(str) : str) { }
 
 		/// same for usablility.
-		ustring(const char *host_str): str_(host_str ? conv_to_u8(host_str) : "") { }
-
-		/// Construct from utf-8 string. 2nd argument is dummy.
-		ustring(const std::string &u8_str, int): str_(u8_str) { }
+		ustring(const char *str, encoding src_enc = enc_host_native)
+			 : str_(src_enc==enc_host_native ? conv_to_u8(str) : str) { }
 
 		/// Copy constructor
 		ustring(const ustring &other): str_(other.str_) { }
@@ -90,7 +89,7 @@ namespace mgit {
 		char operator [](size_t n) const { return str_[n]; }
 
 		/// Concat two utf-8 strings.
-		friend const ustring operator +(const ustring &x, const ustring &y) { return ustring(x.str_ + y.str_, 0); }
+		friend const ustring operator +(const ustring &x, const ustring &y) { return ustring(x.str_ + y.str_, enc_utf_8); }
 
 		/// Compare two utf-8 strings.
 		friend bool operator ==(const ustring &x, const ustring &y) { return x.str_ == y.str_; }

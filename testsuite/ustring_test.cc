@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(ustring_test) {
 		BOOST_CHECK_EQUAL(s1.length(), 15);
 		BOOST_CHECK(!strcmp(s1.a_str().c_str(), STR));
 		BOOST_CHECK(!strcmp(s1.u_str(), aiueo_u8));
-		const ustring s2(aiueo_u8, 0);
+		const ustring s2(aiueo_u8, mgit::enc_utf_8);
 		BOOST_CHECK(!s2.empty());
 		BOOST_CHECK_EQUAL(s2.length(), 15);
 		BOOST_CHECK(!strcmp(s2.a_str().c_str(), STR));
