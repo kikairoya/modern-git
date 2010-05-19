@@ -1,4 +1,10 @@
 import testing ;
+import os ;
+import common ;
+import toolset ;
+import feature ;
+import builtin ;
+import property-set ;
 
 rule suppress-warnings ( properties * )
 {
@@ -13,6 +19,10 @@ rule suppress-warnings ( properties * )
 
 project mgit
     : requirements
+      <toolset>msvc:<target-os>windows
+      <toolset>gcc:<cxxflags>-Wno-long-long
+      <toolset-gcc:flavor>mingw:<target-os>windows
+      <toolset-gcc:flavor>cygwin:<target-os>cygwin
       <link>shared:<define>BOOST_TEST_DYN_LINK=1
       <target-os>cygwin:<linkflags>-liconv
       <library>/boost//headers
@@ -24,12 +34,15 @@ project mgit
     : build-dir bin
     ;
 
+
 lib gitobjs
     :
     [ GLOB . : *.cc ]
-    compat/mingw.cc
     :
+    <target-os>cygwin:<source>compat/cygwin.cc
+    <target-os>windows:<source>compat/mingw.cc
     <link>static
+    :
     ;
 
 local test_sources = [ GLOB testsuite : *.cc ] ;
