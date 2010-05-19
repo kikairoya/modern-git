@@ -42,14 +42,14 @@ namespace mgit {
 	}
 
 	std::string ustring::conv_to_u8(const std::string &host_str) {
-		const string en = get_host_enc_str();
+		const std::string en = get_host_enc_str();
 		if (en=="UTF-8") return host_str;
 		auto_iconv_t ic("UTF-8//IGNORE", en.c_str());
 		return do_conv(ic, host_str);
 	}
 
 	std::string ustring::conv_from_u8(const ustring &utf8_str) {
-		const string en = get_host_enc_str();
+		const std::string en = get_host_enc_str();
 		if (en=="UTF-8") return utf8_str.str_;
 		auto_iconv_t ic((en+"//IGNORE").c_str(), "UTF-8");
 		return do_conv(ic, utf8_str.str_);
@@ -65,12 +65,12 @@ namespace mgit {
 				buf[2] = ntoc(v%36); v /= 36;
 				buf[1] = ntoc(v%36); v /= 36;
 				buf[0] = ntoc(v%36); v /= 36;
-				return ustring(buf, 0);
+				return ustring(buf, enc_utf_8);
 			}
 		}
 		ustring get_temporary_name(const ustring &where, const ustring &prefix, bool create) {
 			for (int n=0; n<26*26*26*26; ++n) {
-				const ustring f = where + ustring("/", 0) + prefix + nval_to_str(n) + ustring(".tmp", 0);
+				const ustring f = fsutil::add_trailing_slash(where) + prefix + nval_to_str(n) + ustring(".tmp", enc_utf_8);
 				const int n = open(f.a_str().c_str(), O_RDWR | (create?O_CREAT:0));
 				if (n>0) {
 					close(n);
@@ -101,5 +101,18 @@ namespace mgit {
 		}
 		bool unix_perm_usable(const ustring &) { return false; }
 		bool ignore_case_path(const ustring &) { return false; }
+
+		ustring add_trailing_slash(const ustring &dir) {
+			return del_trailing_slash(dir) + ustring("/", enc_utf_8);
+		}
+
+		ustring del_trailing_slash(const ustring &dir) {
+			switch (*dir.crbegin()) {
+			case '/':
+			case '\\':
+				return del_trailing_slash(ustring(std::string(dir.u_str(), 0, dir.length()-1), enc_utf_8));
+			}
+			return dir;
+		}
 	}
 }

@@ -100,6 +100,16 @@ namespace mgit {
 
 		/// swap
 		void swap(ustring &other) { std::swap(str_, other.str_); }
+
+		/// iterator access
+		std::string::const_iterator begin() const { return str_.begin(); }
+		std::string::const_iterator cbegin() const { return str_.begin(); }
+		std::string::const_iterator end() const { return str_.end(); }
+		std::string::const_iterator cend() const { return str_.end(); }
+		std::string::const_reverse_iterator rbegin() const { return str_.rbegin(); }
+		std::string::const_reverse_iterator crbegin() const { return str_.rbegin(); }
+		std::string::const_reverse_iterator rend() const { return str_.rend(); }
+		std::string::const_reverse_iterator crend() const { return str_.rend(); }
 	private:
 		static std::string conv_to_u8(const std::string &host_str);
 		static std::string conv_from_u8(const ustring &utf8_str);
