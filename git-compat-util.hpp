@@ -32,6 +32,11 @@ namespace mgit {
 	using std::stringstream;
 	using boost::lexical_cast;
 
+	enum encoding {
+		enc_host_native,
+		enc_utf_8,
+	};
+
 	/** @brief a main string type of internal use
 	 *
 	 * Ustring's encoding is always utf-8. std::string's is host's locale.

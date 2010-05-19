@@ -14,6 +14,7 @@ rule suppress-warnings ( properties * )
 project mgit
     : requirements
       <link>shared:<define>BOOST_TEST_DYN_LINK=1
+      <target-os>cygwin:<linkflags>-liconv
       <library>/boost//headers
       <conditional>@suppress-warnings
       <define>BOOST_ALL_NO_LIB=1
