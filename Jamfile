@@ -17,12 +17,23 @@ rule suppress-warnings ( properties * )
     }
 }
 
+rule select-platform-obj ( properties * )
+{
+    switch [ feature.get-values target-os : $(properties) ]
+    {
+        case cygwin : { return <source>compat/cygwin.cc ; }
+        case windows : { return <source>compat/mingw.cc ; }
+    }
+}
+
 project mgit
     : requirements
       <toolset>msvc:<target-os>windows
       <toolset>gcc:<cxxflags>-Wno-long-long
-      <toolset-gcc:flavor>mingw:<target-os>windows
-      <toolset-gcc:flavor>cygwin:<target-os>cygwin
+      <toolset>gcc,<toolset-gcc:flavor>mingw:<target-os>windows
+      <toolset>gcc,<toolset-gcc:flavor>cygwin:<target-os>cygwin
+      <toolset>gcc,<address-model>64:<link>static
+      <toolset>gcc,<address-model>64:<runtime-link>static
       <link>shared:<define>BOOST_TEST_DYN_LINK=1
       <target-os>cygwin:<linkflags>-liconv
       <library>/boost//headers
@@ -32,15 +43,16 @@ project mgit
     : usage-requirements
       <define>BOOST_TEST_NO_AUTO_LINK=1
     : build-dir bin
-    ;
+    : default-build
+      <address-model>32
+    ;	
 
 
 lib gitobjs
     :
     [ GLOB . : *.cc ]
     :
-    <target-os>cygwin:<source>compat/cygwin.cc
-    <target-os>windows:<source>compat/mingw.cc
+	<conditional>@select-platform-obj
     <link>static
     :
     ;
