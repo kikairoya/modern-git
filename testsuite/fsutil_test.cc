@@ -18,5 +18,6 @@ BOOST_AUTO_TEST_CASE(fsutil_test) {
 		BOOST_CHECK(!strcmp(mgit::fsutil::del_trailing_slash("abc/").u_str(), "abc"));
 		BOOST_CHECK(!strcmp(mgit::fsutil::del_trailing_slash("abc\\").u_str(), "abc"));
 		BOOST_CHECK(!strcmp(mgit::fsutil::del_trailing_slash("abc/\\").u_str(), "abc"));
+		BOOST_CHECK(!strcmp(mgit::fsutil::del_trailing_slash("").u_str(), ""));
 	}
 }

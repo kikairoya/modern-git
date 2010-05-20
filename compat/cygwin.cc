@@ -113,6 +113,7 @@ namespace mgit {
 		}
 
 		ustring del_trailing_slash(const ustring &dir) {
+    		if (dir.empty()) return dir;
 			switch (*dir.crbegin()) {
 			case '/':
 			case '\\':
