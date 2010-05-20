@@ -1,6 +1,8 @@
 #ifndef GIT_COMPAT_UTIL_HPP_
 #define GIT_COMPAT_UTIL_HPP_
 
+#include <boost/config.hpp>
+
 #include <string>
 #include <iterator>
 #include <map>
@@ -73,7 +75,7 @@ namespace mgit {
 		/// Get a string by host's encoding.
 		std::string a_str() const { return conv_from_u8(*this); }
 
-#ifndef NO_WSTRING
+#ifndef BOOST_NO_STD_WSTRING
 		/// Get a wstring by host's wide-encoding.
 		std::wstring w_str() const { return conv_to_u16(*this); }
 #endif
@@ -115,7 +117,7 @@ namespace mgit {
 	private:
 		static std::string conv_to_u8(const std::string &host_str);
 		static std::string conv_from_u8(const ustring &utf8_str);
-#ifndef NO_WSTRING
+#ifndef BOOST_NO_STD_WSTRING
 		static std::wstring conv_to_u16(const std::string &host_str);
 		static std::wstring conv_to_u16(const ustring &utf8_str);
 #endif

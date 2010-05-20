@@ -25,7 +25,7 @@ rule check-wstring ( properties * )
     local targ = [ feature.get-values target-os : $(properties) ] ;
     if $(targ) = cygwin && $(gcc-ver) && $(gcc-ver) < 4
     {
-        return <define>NO_WSTRING=1 <define>OLD_CYGWIN=1 ;
+        return <define>OLD_CYGWIN=1 ;
     }
 }
 
