@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(ustring_test) {
 		const char *const aiueo_sj = "\x82\xa0\x82\xa2\x82\xa4\x82\xa6\x82\xa8";
 		const char *const aiueo_ej = "\xa4\xa2\xa4\xa4\xa4\xa6\xa4\xa8\xa4\xaa";
 		const char *const aiueo_u8 = "\xe3\x81\x82\xe3\x81\x84\xe3\x81\x86\xe3\x81\x88\xe3\x81\x8a";
-#if defined(__MINGW32__) || defined(_MSC_VER) 
+#if defined(__MINGW32__) || defined(_MSC_VER) || defined(OLD_CYGWIN)
 #define STR aiueo_sj
 #elif EUCJP
 #define STR aiueo_ej

@@ -11,13 +11,19 @@
 namespace mgit {
 
 	namespace {
-		__attribute__((constructor)) void loc_init() {
+#ifdef OLD_CYGWIN
+		const std::string code_str = "CP932"; // FIXME!!!
+#else
+		inline std::string get_nl_langinfo_codeset() {
 			setlocale(LC_ALL, "");
+			const char *s = nl_langinfo(CODESET);
+			return s ? s : "UTF-8";
 		}
+		const std::string code_str = get_nl_langinfo_codeset();
+#endif
 		inline std::string get_host_enc_str() {
-			const std::string en(nl_langinfo(CODESET));
-			if (en=="CP720") return "WINDOWS-1256";
-			return en;
+			if (code_str=="CP720") return "WINDOWS-1256";
+			return code_str;
 		}
 		struct auto_iconv_t {
 			auto_iconv_t(const char *from, const char *to): ic(iconv_open(from, to)) { }

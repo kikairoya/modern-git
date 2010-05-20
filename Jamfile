@@ -17,6 +17,18 @@ rule suppress-warnings ( properties * )
     }
 }
 
+rule check-wstring ( properties * )
+{
+    local gcc-ver = [
+        MATCH "^<toolset-gcc:version>([0-9]+)[.]" : $(properties)
+    ] ;
+    local targ = [ feature.get-values target-os : $(properties) ] ;
+    if $(targ) = cygwin && $(gcc-ver) && $(gcc-ver) < 4
+    {
+        return <define>NO_WSTRING=1 <define>OLD_CYGWIN=1 ;
+    }
+}
+
 rule select-platform-obj ( properties * )
 {
     switch [ feature.get-values target-os : $(properties) ]
@@ -39,6 +51,7 @@ project mgit
       <target-os>cygwin:<linkflags>-liconv
       <library>/boost//headers
       <conditional>@suppress-warnings
+      <conditional>@check-wstring
       <define>BOOST_ALL_NO_LIB=1
       <include>.
     : usage-requirements
@@ -54,6 +67,7 @@ lib gitobjs
     [ GLOB . : *.cc ]
     :
     <conditional>@select-platform-obj
+    <link>shared:<library>/boost/system//boost_system
     :
     ;
 
