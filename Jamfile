@@ -23,6 +23,7 @@ rule select-platform-obj ( properties * )
     {
         case cygwin : { return <source>compat/cygwin.cc ; }
         case windows : { return <source>compat/mingw.cc ; }
+        case linux : { return <source>compat/linux.cc ; }
     }
 }
 
@@ -32,8 +33,8 @@ project mgit
       <toolset>gcc:<cxxflags>-Wno-long-long
       <toolset>gcc,<toolset-gcc:flavor>mingw:<target-os>windows
       <toolset>gcc,<toolset-gcc:flavor>cygwin:<target-os>cygwin
-      <toolset>gcc,<address-model>64:<link>static
-      <toolset>gcc,<address-model>64:<runtime-link>static
+      <target-os>windows,<toolset>gcc,<address-model>64:<link>static
+      <target-os>windows,<toolset>gcc,<address-model>64:<runtime-link>static
       <link>shared:<define>BOOST_TEST_DYN_LINK=1
       <target-os>cygwin:<linkflags>-liconv
       <library>/boost//headers
@@ -45,15 +46,14 @@ project mgit
     : build-dir bin
     : default-build
       <address-model>32
-    ;	
+    ;
 
 
 lib gitobjs
     :
     [ GLOB . : *.cc ]
     :
-	<conditional>@select-platform-obj
-    <link>static
+    <conditional>@select-platform-obj
     :
     ;
 

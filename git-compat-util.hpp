@@ -53,7 +53,7 @@ namespace mgit {
 
 		/// same for usablility.
 		ustring(const char *str, encoding src_enc = enc_host_native)
-			 : str_(src_enc==enc_host_native ? conv_to_u8(str) : str) { }
+			 : str_(src_enc==enc_host_native ? conv_to_u8(str ? str : "") : ( str ? str : "" )) { }
 
 		/// Copy constructor
 		ustring(const ustring &other): str_(other.str_) { }
