@@ -63,8 +63,8 @@ namespace mgit {
 
 	namespace fsutil {
 		namespace {
-			inline char ntoc(int n) { return n<10 ? n : 'z'-n; }
-			inline ustring nval_to_str(int v) {
+			inline char ntoc(unsigned n) { return n<10 ? n+'a' : 'z'-n; }
+			inline ustring nval_to_str(unsigned v) {
 				char buf[5];
 				buf[4] = 0;
 				buf[3] = ntoc(v%36); v /= 36;
@@ -75,11 +75,11 @@ namespace mgit {
 			}
 		}
 		ustring get_temporary_name(const ustring &where, const ustring &prefix, bool create) {
-			for (int n=0; n<26*26*26*26; ++n) {
+			for (unsigned n=0; n<26*26*26*26; ++n) {
 				const ustring f = fsutil::add_trailing_slash(where) + prefix + nval_to_str(n) + ustring(".tmp", enc_utf_8);
-				const int n = open(f.a_str().c_str(), O_RDWR | (create?O_CREAT:0));
-				if (n>0) {
-					close(n);
+				const int fd = open(f.a_str().c_str(), O_RDWR | (create?O_CREAT:0));
+				if (fd>0) {
+					close(fd);
 					return f;
 				}
 			}
