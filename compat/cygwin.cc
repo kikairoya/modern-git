@@ -11,17 +11,17 @@
 namespace mgit {
 
 	namespace {
-#ifdef OLD_CYGWIN
-		const std::string code_str = "CP932"; // FIXME!!!
-#else
 		inline std::string get_nl_langinfo_codeset() {
+#ifdef OLD_CYGWIN
+			return "CP932"; // FIXME!!!
+#else
 			setlocale(LC_ALL, "");
 			const char *s = nl_langinfo(CODESET);
 			return s ? s : "UTF-8";
-		}
-		const std::string code_str = get_nl_langinfo_codeset();
 #endif
-		inline std::string get_host_enc_str() {
+		}
+		std::string get_host_enc_str() {
+			static const std::string code_str = get_nl_langinfo_codeset();
 			if (code_str=="CP720") return "WINDOWS-1256";
 			return code_str;
 		}
