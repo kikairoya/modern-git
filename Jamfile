@@ -64,18 +64,19 @@ project mgit
 
 lib gitobjs
     :
-    [ GLOB . : *.cc ]
+    [ path.glob . : *.cc : modern-git.cc ]
     :
     <conditional>@select-platform-obj
     <library>/boost/system//boost_system
-    <library>/boost/program_options//boost_program_options
     :
     ;
 
 exe git
     :
+    modern-git.cc
     gitobjs
     :
+    <library>/boost/program_options//boost_program_options
     ;
 
 
