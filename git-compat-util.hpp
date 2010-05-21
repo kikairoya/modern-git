@@ -8,6 +8,7 @@
 #include <vector>
 #include <list>
 #include <sstream>
+#include <algorithm>
 #include <boost/lexical_cast.hpp>
 
 #ifdef HAS_CXX0X_MEMORY

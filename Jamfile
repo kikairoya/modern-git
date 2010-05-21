@@ -67,9 +67,16 @@ lib gitobjs
     [ GLOB . : *.cc ]
     :
     <conditional>@select-platform-obj
-    <link>shared:<library>/boost/system//boost_system
+    <library>/boost/system//boost_system
     :
     ;
+
+exe git
+    :
+    gitobjs
+    :
+    ;
+
 
 local test_sources = [ GLOB testsuite : *.cc ] ;
 local test_names = $(test_sources:B) ;
