@@ -5,6 +5,7 @@ import toolset ;
 import feature ;
 import builtin ;
 import property-set ;
+import package ;
 
 rule suppress-warnings ( properties * )
 {
@@ -98,3 +99,26 @@ for name in $(test_names)
 }
 
 alias test : $(test_names) ;
+
+
+local prefix = ;
+if [ os.name ] = NT
+{
+    prefix = C:\\mgit ;
+}
+else
+{
+    prefix = /usr/local/mgit ;
+}
+
+package.install install
+    :
+    <install-default-prefix>$(prefix)
+    :
+    git
+    :
+    gitobjs
+    :
+    [ GLOB . : *.hpp ]
+    ;
+explicit install ;
