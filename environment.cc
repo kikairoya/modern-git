@@ -1,19 +1,12 @@
 #include "git-compat-util.hpp"
 #include "path.hpp"
 
+#include "environment.hpp"
+
+#include <string.h>
+
 namespace mgit {
 
-#define GIT_DIR_ENVIRONMENT "GIT_DIR"
-#define GIT_WORK_TREE_ENVIRONMENT "GIT_WORK_TREE"
-#define DEFAULT_GIT_DIR_ENVIRONMENT ".git"
-#define DB_ENVIRONMENT "GIT_OBJECT_DIRECTORY"
-#define INDEX_ENVIRONMENT "GIT_INDEX_FILE"
-#define GRAFT_ENVIRONMENT "GIT_GRAFT_FILE"
-#define TEMPLATE_DIR_ENVIRONMENT "GIT_TEMPLATE_DIR"
-#define CONFIG_ENVIRONMENT "GIT_CONFIG"
-#define EXEC_PATH_ENVIRONMENT "GIT_EXEC_PATH"
-#define CEILING_DIRECTORIES_ENVIRONMENT "GIT_CEILING_DIRECTORIES"
-#define NO_REPLACE_OBJECTS_ENVIRONMENT "GIT_NO_REPLACE_OBJECTS"
 #define GITATTRIBUTES_FILE ".gitattributes"
 #define INFOATTRIBUTES_FILE "info/attributes"
 #define ATTRIBUTE_MACRO_PREFIX "[attr]"
@@ -23,38 +16,51 @@ namespace mgit {
 #define GIT_NOTES_REWRITE_REF_ENVIRONMENT "GIT_NOTES_REWRITE_REF"
 #define GIT_NOTES_REWRITE_MODE_ENVIRONMENT "GIT_NOTES_REWRITE_MODE"
 
-	map<std::string, ustring> git_environ;
-	const std::string git_dir = "git_dir";
-	const std::string git_object_dir = "git_object_dir";
-	const std::string git_refs_dir = "git_refs_dir";
-	const std::string git_index_file = "git_index_file";
-	const std::string git_graft_dir = "git_graft_dir";
-
-	struct git_env_initializer {
-		git_env_initializer() {
-			{
-				ustring s = getenv(GIT_DIR_ENVIRONMENT);
-				//if (s.empty()) s = read_gitfile_gently(DEFAULT_GIT_DIR_ENVIRONMENT);
-				if (s.empty()) s = DEFAULT_GIT_DIR_ENVIRONMENT;
-				git_environ[git_dir] = fsutil::del_trailing_slash(s);
-			} {
-				ustring s = getenv(DB_ENVIRONMENT);
-				if (s.empty()) s = git_environ[git_dir] + "/objects";
-				git_environ[git_object_dir] = fsutil::del_trailing_slash(s);
-			} {
-				git_environ[git_refs_dir] = git_environ[git_dir] + "/refs";
-			} {
-				ustring s = getenv(INDEX_ENVIRONMENT);
-				if (s.empty()) s = git_environ[git_dir] + "/index";
-				git_environ[git_index_file] = fsutil::del_trailing_slash(s);
-			} {
-				ustring s = getenv(GRAFT_ENVIRONMENT);
-				if (s.empty()) s = git_environ[git_dir] + "/info/grafts";
-				git_environ[git_graft_dir] = fsutil::del_trailing_slash(s);
-			}
+	typedef map<std::string, ustring> env_type;
+	namespace {
+		template <typename MapT>
+		inline std::pair<typename MapT::iterator, bool> map_insert(MapT &m, const typename MapT::key_type &k, const typename MapT::mapped_type &v) {
+			return m.insert(std::make_pair(k, v));
 		}
-	} init;
-	ustring get_git_dir() {
-		return git_environ[git_dir];
+		void fill_from_config_file(env_type &e) {
+			// STUB
+		}
+		void fill_default_environ(env_type &e) {
+			map_insert(e, GIT_DIR, ".git");
+			map_insert(e, GIT_DB_DIR, e[GIT_DIR] + "/objects");
+			map_insert(e, GIT_REFS_DIR, e[GIT_DIR] + "/refs");
+			map_insert(e, GIT_INDEX_FILE, e[GIT_DIR] + "/index");
+			map_insert(e, GIT_GRAFT_FILE, e[GIT_DIR] + "/info/grafts");
+		}
+		env_type init_git_environ() {
+			env_type e;
+			char **envp = environ;
+			do {
+				if (const char *p = strchr(*envp, '=')) {
+					map_insert(e, std::string(*envp, p-*envp), ustring(p+1));
+				} else {
+					e[*envp];
+				}
+			} while (*++envp);
+			fill_from_config_file(e);
+			fill_default_environ(e);
+			return e;
+		}
+		env_type git_environ(init_git_environ()); // file-global var.
+	}
+
+	ustring query_env(const std::string &name) {
+		env_type::const_iterator ite = git_environ.find(name);
+		if (ite == git_environ.end()) throw std::runtime_error("cannot find environment variable " + name);
+		return ite->second;
+	}
+
+	ustring query_env(const std::string &name, const ustring &defval) {
+		env_type::const_iterator ite = git_environ.find(name);
+		return ite == git_environ.end() ? defval : ite->second;
+	}
+
+	void override_env(const std::string &name, const ustring &newval) {
+		git_environ[name] = newval;
 	}
 }

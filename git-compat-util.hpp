@@ -100,6 +100,8 @@ namespace mgit {
 
 		/// Stream output with utf-8 encoding. I don't know we need this operator...
 		friend std::ostream &operator <<(std::ostream &os, const ustring &s) { return os << s.str_; }
+		/// Stream input with utf-8 encoding.
+		friend std::istream &operator >>(std::istream &is, ustring &s) { return is >> s.str_; }
 
 		/// swap
 		void swap(ustring &other) { std::swap(str_, other.str_); }
