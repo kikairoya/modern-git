@@ -80,18 +80,16 @@ namespace mgit {
 		bool unix_perm_usable(const ustring &) { return false; }
 		bool ignore_case_path(const ustring &) { return false; }
 
-		ustring add_trailing_slash(const ustring &dir) {
-			return del_trailing_slash(dir) + ustring("\\", enc_utf_8);
+		ustring get_exec_path() {
+			DWORD bufsiz = MAX_PATH;
+			while (1) {
+				vararray<char> buf(bufsiz);
+				DWORD len = GetModuleFileNameA(NULL, buf.c_array(), buf.size());
+				if (!len) throw std::runtime_error("couldn't get exec-path");
+				if (len < buf.size()) return buf.c_array();
+				bufsiz *= 2;
+			}
 		}
 
-		ustring del_trailing_slash(const ustring &dir) {
-    		if (dir.empty()) return dir;
-			switch (*dir.crbegin()) {
-			case '/':
-			case '\\':
-				return del_trailing_slash(ustring(std::string(dir.u_str(), 0, dir.length()-1), enc_utf_8));
-			}
-			return dir;
-		}
 	}
 }

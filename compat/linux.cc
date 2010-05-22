@@ -103,18 +103,5 @@ namespace mgit {
 		bool unix_perm_usable(const ustring &) { return true; }
 		bool ignore_case_path(const ustring &) { return true; }
 
-		ustring add_trailing_slash(const ustring &dir) {
-			return del_trailing_slash(dir) + ustring("/", enc_utf_8);
-		}
-
-		ustring del_trailing_slash(const ustring &dir) {
-    		if (dir.empty()) return dir;
-			switch (*dir.crbegin()) {
-			case '/':
-			case '\\':
-				return del_trailing_slash(ustring(std::string(dir.u_str(), 0, dir.length()-1), enc_utf_8));
-			}
-			return dir;
-		}
 	}
 }

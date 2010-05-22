@@ -40,6 +40,14 @@ rule select-platform-obj ( properties * )
     }
 }
 
+rule select-path-sep ( properties * )
+{
+    switch [ feature.get-values target-os : $(properties) ]
+    {
+        case windows : { return <define>PATH_SEP_BACKSLASH=1 ; }
+    }
+}
+
 project mgit
     : requirements
       <toolset>msvc:<target-os>windows
@@ -53,6 +61,7 @@ project mgit
       <library>/boost//headers
       <conditional>@suppress-warnings
       <conditional>@check-wstring
+      <conditional>@select-path-sep
       <define>BOOST_ALL_NO_LIB=1
       <include>.
     : usage-requirements

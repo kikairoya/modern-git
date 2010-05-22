@@ -2,8 +2,10 @@
 #include "path.hpp"
 
 #include "environment.hpp"
+#include "path.hpp"
 
 #include <string.h>
+#include <stdexcept>
 
 namespace mgit {
 
@@ -31,6 +33,7 @@ namespace mgit {
 			map_insert(e, GIT_REFS_DIR, e[GIT_DIR] + "/refs");
 			map_insert(e, GIT_INDEX_FILE, e[GIT_DIR] + "/index");
 			map_insert(e, GIT_GRAFT_FILE, e[GIT_DIR] + "/info/grafts");
+			map_insert(e, GIT_EXEC_PATH, fsutil::remove_file_name(fsutil::get_exec_path()));
 		}
 		env_type init_git_environ() {
 			env_type e;
