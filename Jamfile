@@ -34,9 +34,9 @@ rule select-platform-obj ( properties * )
 {
     switch [ feature.get-values target-os : $(properties) ]
     {
-        case cygwin : { return <source>compat/cygwin.cc ; }
+        case cygwin : { return <source>compat/cygwin.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
         case windows : { return <source>compat/mingw.cc ; }
-        case linux : { return <source>compat/linux.cc ; }
+        case linux : { return <source>compat/linux.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
     }
 }
 

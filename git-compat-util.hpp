@@ -115,7 +115,7 @@ namespace mgit {
 		std::string::const_reverse_iterator crbegin() const { return str_.rbegin(); }
 		std::string::const_reverse_iterator rend() const { return str_.rend(); }
 		std::string::const_reverse_iterator crend() const { return str_.rend(); }
-	private:
+
 		static std::string conv_to_u8(const std::string &host_str);
 		static std::string conv_from_u8(const ustring &utf8_str);
 #ifndef NO_WSTRING
