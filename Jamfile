@@ -5,7 +5,7 @@ import toolset ;
 import feature ;
 import builtin ;
 import property-set ;
-import package ;
+import option ;
 
 rule suppress-warnings ( properties * )
 {
@@ -101,24 +101,61 @@ for name in $(test_names)
 alias test : $(test_names) ;
 
 
-local prefix = ;
+local prefix = [ option.get prefix ] ;
 if [ os.name ] = NT
 {
-    prefix = C:\\mgit ;
+    prefix ?= C:\\mgit ;
 }
 else
 {
-    prefix = /usr/local/mgit ;
+    prefix ?= /usr/local/mgit ;
 }
 
-package.install install
-    :
-    <install-default-prefix>$(prefix)
+rule select-bin-type ( properties * )
+{
+    switch [ feature.get-values target-os : $(properties) ]
+    {
+        case cygwin     : return <install-type>EXE <install-type>SHARED_LIB ;
+        case windows    : return <install-type>EXE <install-type>SHARED_LIB ;
+        case *          : return <install-type>EXE ;
+    }
+}
+
+rule select-lib-type ( properties * )
+{
+    switch [ feature.get-values target-os : $(properties) ]
+    {
+        case cygwin     : return <install-type>STATIC_LIB ;
+        case windows    : return <install-type>STATIC_LIB ;
+        case *          : return <install-type>LIB ;
+    }
+}
+
+explicit install ;
+install install-bin
     :
     git
     :
-    gitobjs
+    <location>$(prefix)/bin
+    <install-dependencies>on
+    <conditional>@select-bin-type
+    ;
+
+install install-lib
+    :
+    git
+    :
+    <location>$(prefix)/lib
+    <install-dependencies>on
+    <conditional>@select-lib-type
+    ;
+
+install install-inc
     :
     [ GLOB . : *.hpp ]
+    :
+    <location>$(prefix)/include
     ;
-explicit install ;
+
+alias install : install-bin install-lib install-inc ;
+explicit install-bin install-lib install-inc install ;
