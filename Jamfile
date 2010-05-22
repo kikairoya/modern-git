@@ -37,6 +37,7 @@ rule select-platform-obj ( properties * )
         case cygwin : { return <source>compat/cygwin.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
         case windows : { return <source>compat/mingw.cc ; }
         case linux : { return <source>compat/linux.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
+        case solaris : { return <source>compat/solaris.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
     }
 }
 
@@ -58,6 +59,7 @@ project mgit
       <target-os>windows,<toolset>gcc,<address-model>64:<runtime-link>static
       <link>shared:<define>BOOST_TEST_DYN_LINK=1
       <target-os>cygwin:<linkflags>-liconv
+      <target-os>solaris:<linkflags>-liconv
       <library>/boost//headers
       <conditional>@suppress-warnings
       <conditional>@check-wstring

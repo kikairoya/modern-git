@@ -7,6 +7,19 @@
 #include <string.h>
 #include <stdexcept>
 
+// copy from Hamigaki.Process
+#if defined(__APPLE__) && defined(__DYNAMIC__)
+    #include <crt_externs.h>
+    #if !defined(environ)
+        #define environ (*_NSGetEnviron())
+    #endif
+#else
+extern "C"
+{
+    extern char** environ;
+}
+#endif
+
 namespace mgit {
 
 #define GITATTRIBUTES_FILE ".gitattributes"
