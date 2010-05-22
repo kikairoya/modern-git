@@ -137,6 +137,7 @@ install install-bin
     git
     :
     <location>$(prefix)/bin
+    <dll-path>$(prefix)/lib
     <install-dependencies>on
     <conditional>@select-bin-type
     ;
