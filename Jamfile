@@ -38,6 +38,7 @@ rule select-platform-obj ( properties * )
         case windows : { return <source>compat/mingw.cc ; }
         case linux : { return <source>compat/linux.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
         case solaris : { return <source>compat/solaris.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
+        case freebsd : { return <source>compat/freebsd.cc <source>compat/unix-path.cc <source>compat/encode-iconv.cc ; }
     }
 }
 
@@ -60,6 +61,7 @@ project mgit
       <link>shared:<define>BOOST_TEST_DYN_LINK=1
       <target-os>cygwin:<linkflags>-liconv
       <target-os>solaris:<linkflags>-liconv
+      <target-os>freebsd:<linkflags>-liconv
       <library>/boost//headers
       <conditional>@suppress-warnings
       <conditional>@check-wstring
