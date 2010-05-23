@@ -2,7 +2,6 @@
 #include "path.hpp"
 
 #include <stdexcept>
-#include <vector>
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
@@ -24,7 +23,7 @@ namespace mgit {
 			if (oldlen == 0) {
 				return ustring();
 			}
-			std::vector<char> buf(oldlen);
+			vararray<char> buf(oldlen);
 			if (sysctl(name, namelen, &buf[0], &oldlen, 0, 0) == -1) {
 				throw std::runtime_error("couldn'd get exec-path");
 			}
