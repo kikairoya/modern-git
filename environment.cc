@@ -31,6 +31,14 @@ namespace mgit {
 #define GIT_NOTES_REWRITE_REF_ENVIRONMENT "GIT_NOTES_REWRITE_REF"
 #define GIT_NOTES_REWRITE_MODE_ENVIRONMENT "GIT_NOTES_REWRITE_MODE"
 
+	ustring get_config_file_name(config_level level) {
+		switch (level) {
+		case repository_config: return get_repository_config_file_name();
+		case user_local_config: return get_user_local_config_file_name();
+		case system_wide_config:return get_system_wide_config_file_name();
+		}
+	}
+
 	typedef map<std::string, ustring> env_type;
 	namespace {
 		template <typename MapT>

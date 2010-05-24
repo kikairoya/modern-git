@@ -42,6 +42,15 @@ namespace mgit {
 	ustring query_env(const std::string &name, const ustring &defval);
 	/// Set environment value.
 	void override_env(const std::string &name, const ustring &newval);
+
+	/// Config file type
+	enum config_level {
+		repository_config,
+		user_local_config,
+		system_wide_config,
+	};
+	/// Get config file name.
+	ustring get_config_file_name(config_level level);
 }
 
 #endif
