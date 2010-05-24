@@ -10,6 +10,7 @@
 #include <sstream>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
+#include <boost/range.hpp>
 
 #ifdef HAS_CXX0X_MEMORY
 namespace mgit {
@@ -32,6 +33,8 @@ namespace mgit {
 	using std::vector;
 	using std::stringstream;
 	using boost::lexical_cast;
+	using boost::begin;
+	using boost::end;
 
 	enum encoding {
 		enc_host_native,
