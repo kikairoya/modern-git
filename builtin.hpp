@@ -6,7 +6,24 @@
 
 namespace mgit {
 	typedef boost::program_options::options_description opt_desc;
+	typedef boost::program_options::positional_options_description pos_opt_desc;
+	typedef boost::program_options::variables_map var_map;
+	namespace opt {
+		using boost::program_options::value;
+	}
+
 	typedef int (*cmd_function)(int argc, char **argv, opt_desc &);
+	inline var_map parse_argv(int argc, char **argv, opt_desc &opt, pos_opt_desc &cmd) {
+		using namespace boost::program_options;
+		var_map vm;
+		store(command_line_parser(argc, argv).options(opt).positional(cmd).run(), vm);
+		return vm;
+	}
+
+	inline int print_usage(const std::string &s) {
+		std::cout << s << std::endl;
+		return 0;
+	}
 
 	int cmd_add(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	int cmd_am(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
@@ -118,7 +135,7 @@ namespace mgit {
 	int cmd_show_index(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	int cmd_show_ref(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	int cmd_tar_tree(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
-	int cmd_unpack_file(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
+	int cmd_unpack_file(int argc, char **argv, opt_desc &opt);
 	int cmd_var(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	int cmd_verify_pack(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 

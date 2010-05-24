@@ -6,7 +6,6 @@
 
 namespace mgit {
 	namespace {
-		namespace po = boost::program_options;
 		struct printer {
 			printer(std::ostream &os): os(os) { }
 			void operator ()(const std::string &s) { os << s << '\n'; }
@@ -163,30 +162,29 @@ namespace mgit {
 		};
 	}
 	int main(int argc, char **argv) {
-		using namespace po;
-		options_description general_option("General Option");
+		opt_desc general_option("General Option");
 		general_option.add_options()
 			("version", "print version information")
 			("help", "print help message")
-			("exec-path", value<std::string>(), "specify exec path or print default path")
+			("exec-path", opt::value<std::string>(), "specify exec path or print default path")
 			("html-path", "print html path")
-			("pagenate,p", value<std::string>(), "specify pager")
+			("pagenate,p", opt::value<std::string>(), "specify pager")
 			("no-pager", "not use pager")
 			("no-replace-objects", "see git-replace(1)")
 			("bare", "treat as bare repository")
-			("git-dir", value<std::string>(), "specify git repository")
-			("work-tree", value<std::string>(), "specify working-tree directory")
+			("git-dir", opt::value<std::string>(), "specify git repository")
+			("work-tree", opt::value<std::string>(), "specify working-tree directory")
 				;
-		options_description hidden_option("Hidden");
+		opt_desc hidden_option("Hidden");
 		hidden_option.add_options()
-			("command", value<std::string>(), "command to run")
-			("targets", value< vector<std::string> >(), "target files, revs, tags, branches, repos...")
+			("command", opt::value<std::string>(), "command to run")
+			("targets", opt::value< vector<std::string> >(), "target files, revs, tags, branches, repos...")
 				;
 		general_option.add(hidden_option);
-		positional_options_description nonhyphen_option;
+		pos_opt_desc nonhyphen_option;
 		nonhyphen_option.add("command", 1).add("targets", -1);
-		variables_map vm;
-		store(command_line_parser(argc, argv).options(general_option).positional(nonhyphen_option).run(), vm);
+
+		var_map vm = parse_argv(argc, argv, general_option, nonhyphen_option);
 
 		bool no_op = false;
 
