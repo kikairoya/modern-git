@@ -50,6 +50,14 @@ rule select-path-sep ( properties * )
     }
 }
 
+rule check-home-env-enable ( properties * )
+{
+    switch [ feature.get-values target-os : $(properties) ]
+    {
+        case windows : { return <define>IGNORE_HOME_ENV=1 ; }
+    }
+}
+
 project mgit
     : requirements
       <toolset>msvc:<target-os>windows
@@ -66,6 +74,7 @@ project mgit
       <conditional>@suppress-warnings
       <conditional>@check-wstring
       <conditional>@select-path-sep
+      <conditional>@check-home-env-enable
       <define>BOOST_ALL_NO_LIB=1
       <include>.
     : usage-requirements

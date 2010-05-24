@@ -237,6 +237,8 @@ namespace mgit {
 			std::cout << "no command specified" << std::endl;
 			return 0;
 		}
+
+		init_env();
 		if (vm.count("exec-path")) override_env(GIT_EXEC_PATH, vm["exec-path"].as<std::string>());
 		if (vm.count("git-dir")) override_env(GIT_DIR, vm["git-dir"].as<std::string>());
 		if (vm.count("work-tree")) override_env(GIT_WORK_TREE, vm["work-tree"].as<std::string>());

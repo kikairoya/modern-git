@@ -23,6 +23,7 @@ namespace mgit {
 		ustring remove_file_name(const ustring &fullpath);
 		ustring extract_file_name(const ustring &fullpath);
 		ustring get_exec_path();
+		ustring get_user_config_dir();
 	}
 }
 

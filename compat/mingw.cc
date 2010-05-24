@@ -3,6 +3,11 @@
 
 #include <stdexcept>
 #include <windows.h>
+#include <shlobj.h>
+
+#ifdef _MSC_VER
+#pragma comment(lib,"shell32.lib")
+#endif
 
 namespace mgit {
 
@@ -89,6 +94,12 @@ namespace mgit {
 				if (len < buf.size()) return buf.c_array();
 				bufsiz *= 2;
 			}
+		}
+
+		ustring get_user_config_dir() {
+			WCHAR dir[MAX_PATH];
+			if (!SHGetSpecialFolderPathW(NULL, dir, CSIDL_LOCAL_APPDATA, TRUE)) throw std::runtime_error("cannot get CSIDL_LOCAL_APPDATA");
+			return add_trailing_slash(ustring(conv_from_utf16(dir, enc_utf_8), enc_utf_8)) + "/modern-git/config";
 		}
 
 	}

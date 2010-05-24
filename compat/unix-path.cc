@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 namespace mgit {
 	namespace fsutil {
@@ -52,6 +54,11 @@ namespace mgit {
 		}
 		bool unix_perm_usable(const ustring &) { return false; }
 		bool ignore_case_path(const ustring &) { return false; }
+
+		ustring get_user_config_dir() {
+			static const ustring dir = del_trailing_slash(getenv("HOME") ? getenv("HOME") : getpwuid(getuid())->pw_dir);
+			return dir;
+		}
 
 	}
 }

@@ -17,8 +17,4 @@ namespace mgit {
 			}
 		}
 	}
-	ustring get_system_wide_config_file_name() {
-		const ustring base = fsutil::remove_file_name(fsutil::remove_file_name(get_exec_path));
-		return fsutil::add_trailing_slash(base) + "etc/gitconfig";
-	}
 }
