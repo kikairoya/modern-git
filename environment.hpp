@@ -36,6 +36,8 @@ namespace mgit {
 #define GIT_EXEC_PATH "GIT_EXEC_PATH"
 #define GIT_NO_REPLACE_OBJECTS "GIT_NO_REPLACE_OBJECTS"
 
+	/// Initializer global environment.
+	void init_env();
 	/// Get value from environment or config file. If value is not found, throw runtime_error.
 	ustring query_env(const std::string &name);
 	/// Get value from environment or config file with default-value.
