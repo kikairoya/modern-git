@@ -35,7 +35,7 @@ namespace mgit {
 		bool symlink_usable(const ustring &where) {
 			const ustring trgname = get_temporary_name(where, "tht", true);
 			const ustring lnkname = get_temporary_name(where, "thl");
-			if (!link(trgname.a_str().c_str(), lnkname.a_str().c_str())) {
+			if (!symlink(trgname.a_str().c_str(), lnkname.a_str().c_str())) {
 				unlink(lnkname.a_str().c_str());
 				unlink(trgname.a_str().c_str());
 				return true;
@@ -45,7 +45,7 @@ namespace mgit {
 		bool hardlink_usable(const ustring &where) {
 			const ustring trgname = get_temporary_name(where, "tht", true);
 			const ustring lnkname = get_temporary_name(where, "thl");
-			if (!symlink(trgname.a_str().c_str(), lnkname.a_str().c_str())) {
+			if (!link(trgname.a_str().c_str(), lnkname.a_str().c_str())) {
 				unlink(lnkname.a_str().c_str());
 				unlink(trgname.a_str().c_str());
 				return true;
