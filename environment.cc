@@ -1,6 +1,6 @@
 #include "git-compat-util.hpp"
 #include "path.hpp"
-
+#include "config.hpp"
 #include "environment.hpp"
 #include "path.hpp"
 

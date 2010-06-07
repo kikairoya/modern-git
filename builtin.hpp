@@ -62,7 +62,7 @@ namespace mgit {
 	inline int cmd_submodule(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_tag(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 
-	inline int cmd_config(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
+	int cmd_config(int argc, char **argv, opt_desc &opt);
 	inline int cmd_fast_export(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_fast_import(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_filter_branch(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }

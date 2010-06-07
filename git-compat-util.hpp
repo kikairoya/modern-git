@@ -10,7 +10,7 @@
 #include <sstream>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
-#include <boost/range.hpp>
+#include <boost/variant.hpp>
 
 #ifdef HAS_CXX0X_MEMORY
 namespace mgit {
@@ -33,8 +33,7 @@ namespace mgit {
 	using std::vector;
 	using std::stringstream;
 	using boost::lexical_cast;
-	using boost::begin;
-	using boost::end;
+	using boost::variant;
 
 	enum encoding {
 		enc_host_native,
@@ -96,10 +95,16 @@ namespace mgit {
 
 		/// Concat two utf-8 strings.
 		friend const ustring operator +(const ustring &x, const ustring &y) { return ustring(x.str_ + y.str_, enc_utf_8); }
+		friend const ustring operator +(const ustring &x, char y) { return ustring(x.str_ + y, enc_utf_8); }
+		friend const ustring operator +(char x, const ustring &y) { return ustring(x + y.str_, enc_utf_8); }
 
 		/// Compare two utf-8 strings.
 		friend bool operator ==(const ustring &x, const ustring &y) { return x.str_ == y.str_; }
 		friend bool operator !=(const ustring &x, const ustring &y) { return x.str_ != y.str_; }
+		friend bool operator <(const ustring &x, const ustring &y) { return x.str_ < y.str_; }
+		friend bool operator <=(const ustring &x, const ustring &y) { return x.str_ <= y.str_; }
+		friend bool operator >(const ustring &x, const ustring &y) { return x.str_ > y.str_; }
+		friend bool operator >=(const ustring &x, const ustring &y) { return x.str_ >= y.str_; }
 
 		/// Stream output with utf-8 encoding. I don't know we need this operator...
 		friend std::ostream &operator <<(std::ostream &os, const ustring &s) { return os << s.str_; }
@@ -163,6 +168,10 @@ namespace mgit {
 		T *elem_;
 	};
 
+	template <typename T, size_t N>
+	T *array_begin(T (&a)[N]) { return a; }
+	template <typename T, size_t N>
+	T *array_end(T (&a)[N]) { return a+N; }
 
 	bool filemode_trustable();
 }

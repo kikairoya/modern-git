@@ -245,8 +245,8 @@ namespace mgit {
 		if (vm.count("paginate")) override_env(GIT_PAGER, vm["paginate"].as<std::string>());
 
 		const std::string cmdstr = vm["command"].as<std::string>();
-		const command_set *pcmd = std::find_if(begin(git_cmds), end(git_cmds), match_command(cmdstr));
-		if (pcmd==end(git_cmds)) {
+		const command_set *pcmd = std::find_if(array_begin(git_cmds), array_end(git_cmds), match_command(cmdstr));
+		if (pcmd==array_end(git_cmds)) {
 			std::cout << "no such command: " << cmdstr << std::endl;
 			return 1;
 		}
