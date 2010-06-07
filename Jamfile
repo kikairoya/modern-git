@@ -88,7 +88,7 @@ project mgit
 lib gitobjs
     :
     [ path.glob . : *.cc : modern-git.cc ]
-    [ path.glob builtin : *.cc : modern-git.cc ]
+    [ path.glob builtin : *.cc ]
     :
     <conditional>@select-platform-obj
     <library>/boost/system//boost_system
@@ -111,10 +111,13 @@ local test_sources = [ GLOB testsuite : *.cc ] ;
 local test_names = $(test_sources:B) ;
 for name in $(test_names)
 {
+    local input-files ;
+    if $(name) = config_test { input-files += test.cfg ; }
     run testsuite/$(name).cc
         gitobjs
         :
         :
+        $(input-files)
         :
         <library>/boost/system//boost_system
         <library>/boost/test//boost_unit_test_framework
