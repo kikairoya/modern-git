@@ -15,10 +15,12 @@
         #define environ (*_NSGetEnviron())
     #endif
 #else
+#ifndef _MSC_VER
 extern "C"
 {
     extern char** environ;
 }
+#endif
 #endif
 
 namespace mgit {

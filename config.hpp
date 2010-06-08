@@ -26,7 +26,7 @@ namespace mgit {
 		friend bool operator ==(const git_config_name &x, const git_config_name &y) { return x.key==y.key; }
 		friend bool operator <(const git_config_name &x, const git_config_name &y) { return x.key < y.key; }
 	};
-	typedef variant<ustring, long long, bool> git_config_value;
+	typedef variant<ustring, intmax_t, int, double, bool> git_config_value;
 	typedef map<git_config_name, git_config_value> git_config_map;
 	git_config_map read_config_file(const ustring &cfgfile);
 	std::ostream &operator <<(std::ostream &os, const git_config_map::value_type &v);

@@ -5,6 +5,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/foreach.hpp>
 #include <fstream>
@@ -45,32 +46,60 @@ namespace mgit {
 	namespace phoenix = boost::phoenix;
 
 	template <typename Iter>
-	struct cfg_parser: qi::grammar<Iter, std::vector<section_t>(), ascii::space_type> {
+	struct cfg_parser: qi::grammar<Iter, std::vector<section_t>()> {
 		cfg_parser(): cfg_parser::base_type(all) {
 			using qi::lit;
 			using qi::lexeme;
-			using qi::char_;
 			using qi::eps;
+			using qi::eol;
+			using qi::on_error;
+			using qi::fail;
+			using qi::omit;
 			using ascii::alnum;
+			using ascii::char_;
+			using ascii::space;
+			using phoenix::val;
+			using phoenix::construct;
 			using namespace qi::labels;
 
-#define quot lit('"') // what's lit? type? object? can't find where this is defined.
-			eol %= lexeme[+char_("\r\n")];
-			normal_str %= lexeme[+(alnum | char_("-_/") | char_("0x80-0xFD"))];
-			quot_str %= quot >> lexeme[+(alnum | char_("-_/\\+*") | char_("0x80-0xFD"))] >> quot;
-			value_set %= normal_str >> '=' >> ( normal_str | quot_str );
-			sec_header %= '[' >> normal_str >> ((quot >> normal_str >> quot) | eps) >> ']';
-			sec %= sec_header >> +value_set;
-			all %= +sec;
-#undef quot
+			comment = -lit(';') > *(char_-'\n'-'\r') > eol;
+			spc = char_(" \t");
+			normal_chr %= alnum | char_("-_/") | char_("0x80-0xFD");
+			normal_str %= lexeme[+normal_chr];
+			quot_str %= lit('"') > +(normal_chr | char_("\\+* \t.")) > lit('"');
+			value_set %= *(spc|eol) >> normal_str > *spc > '=' > *spc > ( normal_str | quot_str ) > *spc > comment;
+			sec_header %= *(spc|eol) >> '[' > *spc > normal_str > -(( +spc > quot_str ) | ('.' > normal_str)) > *spc > ']' > *spc > comment;
+			sec %= sec_header > *value_set;
+			all %= +sec > *(spc|eol);
+
+			spc.name("spaces");
+			normal_chr.name("normal_chr");
+			normal_str.name("normal_str");
+			quot_str.name("quot_str");
+			value_set.name("value_set");
+			sec_header.name("sec_header");
+			sec.name("sec");
+			all.name("all");
+			on_error<fail> (
+				all,
+				std::cout
+				<< val("Error! Expecting ")
+				<< _4
+				<< val(" here: \"")
+				<< construct<std::string>(_3, _2)
+				<< val("\"")
+				<< std::endl
+				);
 		}
-		qi::rule<Iter, std::string(), ascii::space_type> eol;
-		qi::rule<Iter, std::string(), ascii::space_type> normal_str;
-		qi::rule<Iter, std::string(), ascii::space_type> quot_str;
-		qi::rule<Iter, value_pair_t(), ascii::space_type> value_set;
-		qi::rule<Iter, section_header_t(), ascii::space_type> sec_header;
-		qi::rule<Iter, section_t(), ascii::space_type> sec;
-		qi::rule<Iter, vector<section_t>(), ascii::space_type> all;
+		qi::rule<Iter> comment;
+		qi::rule<Iter> spc;
+		qi::rule<Iter, char()> normal_chr;
+		qi::rule<Iter, std::string()> normal_str;
+		qi::rule<Iter, std::string()> quot_str;
+		qi::rule<Iter, value_pair_t()> value_set;
+		qi::rule<Iter, section_header_t()> sec_header;
+		qi::rule<Iter, section_t()> sec;
+		qi::rule<Iter, vector<section_t>()> all;
 	};
 
 	std::ostream &operator <<(std::ostream &os, const git_config_map::value_type &v) {
@@ -105,13 +134,14 @@ namespace mgit {
 		buf_type buf;
 		{
 			std::ifstream ifs(cfgfile.a_str().c_str());
+			ifs.unsetf(std::ios_base::skipws);
 			std::copy(std::istream_iterator<char>(ifs), std::istream_iterator<char>(), std::back_inserter(buf));
 		}
 		std::vector<section_t> sections;
 		std::string s;
 		iter_type first = buf.begin();
 		mgit::cfg_parser<iter_type> parser;
-		boost::spirit::qi::phrase_parse(first, buf.end(), parser, boost::spirit::ascii::space, sections);
+		boost::spirit::qi::parse(first, buf.end(), parser, sections);
 		mgit::git_config_map cfgmap;
 		mgit::build_config_map(cfgmap, sections);
 		return cfgmap;

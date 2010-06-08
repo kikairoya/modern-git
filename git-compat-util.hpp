@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <boost/variant.hpp>
+#include <boost/cstdint.hpp>
 
 #ifdef HAS_CXX0X_MEMORY
 namespace mgit {
@@ -34,6 +35,8 @@ namespace mgit {
 	using std::stringstream;
 	using boost::lexical_cast;
 	using boost::variant;
+	using boost::intmax_t;
+	using boost::uintmax_t;
 
 	enum encoding {
 		enc_host_native,

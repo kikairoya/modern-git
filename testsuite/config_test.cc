@@ -12,20 +12,24 @@ BOOST_AUTO_TEST_CASE(config_test) {
 			mgit::git_config_value()
 		);
 		BOOST_CHECK_EQUAL(
-			m[mgit::git_config_name("core", "", "str")],
+			m[mgit::git_config_name("core", "", "ignorecase")],
+			mgit::git_config_value(true)
+		);
+		BOOST_CHECK_EQUAL(
+			m[mgit::git_config_name("core", "", "repositoryFormatVersion")],
+			mgit::git_config_value(0.0)
+		);
+		BOOST_CHECK_EQUAL(
+			m[mgit::git_config_name("core", "", "editor")],
+			mgit::git_config_value(mgit::ustring("vi"))
+		);
+		BOOST_CHECK_EQUAL(
+			m[mgit::git_config_name("other", "subsec", "cfg")],
 			mgit::git_config_value(mgit::ustring("value"))
 		);
 		BOOST_CHECK_EQUAL(
-			m[mgit::git_config_name("core", "", "num")],
-			mgit::git_config_value(10LL)
-		);
-		BOOST_CHECK_EQUAL(
-			m[mgit::git_config_name("sec2", "subsec1", "subname1")],
-			mgit::git_config_value(mgit::ustring("subvalue1"))
-		);
-		BOOST_CHECK_EQUAL(
-			m[mgit::git_config_name("cc", "", "cc")],
-			mgit::git_config_value(mgit::ustring("cc"))
+			m[mgit::git_config_name("other2", "subsec", "cfg")],
+			mgit::git_config_value(mgit::ustring("value"))
 		);
 	}
 }
