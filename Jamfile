@@ -93,7 +93,7 @@ lib gitobjs
     <conditional>@select-platform-obj
     <library>/boost/system//boost_system
     <library>/boost/program_options//boost_program_options
-    <toolset>gcc:<cxxflags>-ftemplate-depth-200
+    <toolset>gcc:<c++-template-depth>200
     :
     ;
 
