@@ -46,31 +46,55 @@ namespace mgit {
 	namespace phoenix = boost::phoenix;
 
 	template <typename Iter>
-	struct cfg_parser: qi::grammar<Iter, std::vector<section_t>()> {
+	struct skip_parser: qi::grammar<Iter> {
+		skip_parser(): skip_parser::base_type(all) {
+			using qi::eol;
+			using qi::lexeme;
+			using qi::lit;
+			using ascii::char_;
+			using ascii::space;
+
+			comment = lexeme[char_(";#") >> *(char_-'\n'-'\r') >> eol];
+			all = space | comment;
+		}
+		qi::rule<Iter> comment;
+		qi::rule<Iter> all;
+	};
+
+	template <typename Iter>
+	struct blank_parser: qi::grammar<Iter> {
+		blank_parser(): blank_parser::base_type(all) {
+			using ascii::blank;
+
+			all = blank;
+		}
+		qi::rule<Iter> all;
+	};
+
+	template <typename Iter>
+	struct cfg_parser: qi::grammar<Iter, std::vector<section_t>(), skip_parser<Iter> > {
 		cfg_parser(): cfg_parser::base_type(all) {
 			using qi::lit;
 			using qi::lexeme;
-			using qi::eps;
 			using qi::eol;
+			using qi::no_skip;
 			using qi::on_error;
 			using qi::fail;
-			using qi::omit;
 			using ascii::alnum;
 			using ascii::char_;
-			using ascii::space;
 			using phoenix::val;
 			using phoenix::construct;
 			using namespace qi::labels;
 
-			comment = -lit(';') > *(char_-'\n'-'\r') > eol;
 			spc = char_(" \t");
 			normal_chr %= alnum | char_("-_/") | char_("0x80-0xFD");
 			normal_str %= lexeme[+normal_chr];
-			quot_str %= lit('"') > +(normal_chr | char_("\\+* \t.")) > lit('"');
-			value_set %= *(spc|eol) >> normal_str > *spc > '=' > *spc > ( normal_str | quot_str ) > *spc > comment;
-			sec_header %= *(spc|eol) >> '[' > *spc > normal_str > -(( +spc > quot_str ) | ('.' > normal_str)) > *spc > ']' > *spc > comment;
-			sec %= sec_header > *value_set;
-			all %= +sec > *(spc|eol);
+			value_str %= lexeme[+(normal_chr | lit('.'))];
+			quot_str %= lit('"') >> lexeme[*(normal_chr | char_("\\+* \t."))] > lit('"');
+			value_set %= normal_str >> '=' >> ( value_str | quot_str );
+			sec_header %= '[' >> normal_str >> no_skip[('.' >> normal_str) | -(+spc >> quot_str)] > ']';
+			sec %= sec_header >> *value_set;
+			all %= *sec;
 
 			spc.name("spaces");
 			normal_chr.name("normal_chr");
@@ -91,15 +115,15 @@ namespace mgit {
 				<< std::endl
 				);
 		}
-		qi::rule<Iter> comment;
 		qi::rule<Iter> spc;
 		qi::rule<Iter, char()> normal_chr;
 		qi::rule<Iter, std::string()> normal_str;
+		qi::rule<Iter, std::string()> value_str;
 		qi::rule<Iter, std::string()> quot_str;
-		qi::rule<Iter, value_pair_t()> value_set;
-		qi::rule<Iter, section_header_t()> sec_header;
-		qi::rule<Iter, section_t()> sec;
-		qi::rule<Iter, vector<section_t>()> all;
+		qi::rule<Iter, value_pair_t(), blank_parser<Iter> > value_set;
+		qi::rule<Iter, section_header_t(), blank_parser<Iter> > sec_header;
+		qi::rule<Iter, section_t(), skip_parser<Iter> > sec;
+		qi::rule<Iter, vector<section_t>(), skip_parser<Iter> > all;
 	};
 
 	std::ostream &operator <<(std::ostream &os, const git_config_map::value_type &v) {
@@ -141,7 +165,8 @@ namespace mgit {
 		std::string s;
 		iter_type first = buf.begin();
 		mgit::cfg_parser<iter_type> parser;
-		boost::spirit::qi::parse(first, buf.end(), parser, sections);
+		mgit::skip_parser<iter_type> skipper;
+		boost::spirit::qi::phrase_parse(first, buf.end(), parser, skipper, sections);
 		mgit::git_config_map cfgmap;
 		mgit::build_config_map(cfgmap, sections);
 		return cfgmap;
