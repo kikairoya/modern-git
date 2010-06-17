@@ -9,12 +9,12 @@ BOOST_AUTO_TEST_CASE(ustring_test) {
 	{
 		const ustring s("");
 		BOOST_CHECK(s.empty());
-		BOOST_CHECK_EQUAL(s.length(), 0);
+		BOOST_CHECK_EQUAL(s.length(), 0u);
 	} {
 		const char *const sc = "0";
 		const ustring s(sc);
 		BOOST_CHECK(!s.empty());
-		BOOST_CHECK_EQUAL(s.length(), 1);
+		BOOST_CHECK_EQUAL(s.length(), 1u);
 		BOOST_CHECK(!strcmp(s.a_str().c_str(), sc));
 	} {
 		const char *const aiueo_sj = "\x82\xa0\x82\xa2\x82\xa4\x82\xa6\x82\xa8";
@@ -29,17 +29,17 @@ BOOST_AUTO_TEST_CASE(ustring_test) {
 #endif
 		const ustring s1(STR);
 		BOOST_CHECK(!s1.empty());
-		BOOST_CHECK_EQUAL(s1.length(), 15);
+		BOOST_CHECK_EQUAL(s1.length(), 15u);
 		BOOST_CHECK(!strcmp(s1.a_str().c_str(), STR));
 		BOOST_CHECK(!strcmp(s1.u_str(), aiueo_u8));
 		const ustring s2(aiueo_u8, mgit::enc_utf_8);
 		BOOST_CHECK(!s2.empty());
-		BOOST_CHECK_EQUAL(s2.length(), 15);
+		BOOST_CHECK_EQUAL(s2.length(), 15u);
 		BOOST_CHECK(!strcmp(s2.a_str().c_str(), STR));
 		BOOST_CHECK(!strcmp(s2.u_str(), aiueo_u8));
 		const ustring s3(s1 + s2);
 		const std::string ss(std::string(STR)+STR);
-		BOOST_CHECK_EQUAL(s3.length(), 30);
+		BOOST_CHECK_EQUAL(s3.length(), 30u);
 		BOOST_CHECK(!strcmp(s3.a_str().c_str(), ss.c_str()));
 		BOOST_CHECK(!strcmp(s3.u_str(), std::string(aiueo_u8).append(aiueo_u8).c_str()));
 		BOOST_CHECK(s1 == s2);
