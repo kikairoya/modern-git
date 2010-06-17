@@ -3,6 +3,10 @@
 
 #include "git-compat-util.hpp"
 
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_PREFIX
+#endif
+
 namespace mgit {
 
 #define GIT_INDEX_FILE "GIT_INDEX_FILE"
@@ -37,15 +41,19 @@ namespace mgit {
 #define GIT_NO_REPLACE_OBJECTS "GIT_NO_REPLACE_OBJECTS"
 
 	/// Initializer global environment.
-	void init_env();
+	MGIT_DECL void init_env();
 	/// Get value from environment or config file. If value is not found, throw runtime_error.
-	ustring query_env(const std::string &name);
+	MGIT_DECL ustring query_env(const std::string &name);
 	/// Get value from environment or config file with default-value.
-	ustring query_env(const std::string &name, const ustring &defval);
+	MGIT_DECL ustring query_env(const std::string &name, const ustring &defval);
 	/// Set environment value.
-	void override_env(const std::string &name, const ustring &newval);
+	MGIT_DECL void override_env(const std::string &name, const ustring &newval);
 	/// Merge environment and config file.
-	void merge_to_config();
+	MGIT_DECL void merge_to_config();
 }
+
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_SUFFIX
+#endif
 
 #endif

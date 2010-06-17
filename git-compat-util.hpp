@@ -1,6 +1,7 @@
 #ifndef GIT_COMPAT_UTIL_HPP_
 #define GIT_COMPAT_UTIL_HPP_
 
+#include "mgit-export.hpp"
 #include <string>
 #include <iterator>
 #include <map>
@@ -12,6 +13,10 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/variant.hpp>
 #include <boost/cstdint.hpp>
+
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_PREFIX
+#endif
 
 #ifdef HAS_CXX0X_MEMORY
 namespace mgit {
@@ -48,7 +53,7 @@ namespace mgit {
 	 * Ustring's encoding is always utf-8. std::string's is host's locale.
 	 * To avoid implicitly confusing encode, I think this class would be immutable.
 	 **/
-	class ustring {
+	class MGIT_DECL ustring {
 	public:
 		/// Default ctor with empty string. std::map requires this.
 		ustring(): str_() { }
@@ -183,5 +188,9 @@ namespace std {
 	template <>
 	inline void swap<mgit::ustring>(mgit::ustring &x, mgit::ustring &y) { x.swap(y); }
 }
+
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_SUFFIX
+#endif
 
 #endif

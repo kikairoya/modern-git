@@ -1,8 +1,13 @@
 #ifndef BUILTIN_HPP_
 #define BUILTIN_HPP_
 
+#include "mgit-export.hpp"
 #include <iostream>
 #include <boost/program_options.hpp>
+
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_PREFIX
+#endif
 
 namespace mgit {
 	typedef boost::program_options::options_description opt_desc;
@@ -62,7 +67,7 @@ namespace mgit {
 	inline int cmd_submodule(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_tag(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 
-	int cmd_config(int argc, char **argv, opt_desc &opt);
+	MGIT_DECL int cmd_config(int argc, char **argv, opt_desc &opt);
 	inline int cmd_fast_export(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_fast_import(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_filter_branch(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
@@ -135,7 +140,7 @@ namespace mgit {
 	inline int cmd_show_index(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_show_ref(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_tar_tree(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
-	int cmd_unpack_file(int argc, char **argv, opt_desc &opt);
+	MGIT_DECL int cmd_unpack_file(int argc, char **argv, opt_desc &opt);
 	inline int cmd_var(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_verify_pack(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 
@@ -164,5 +169,9 @@ namespace mgit {
 	inline int cmd_sh_setup(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 	inline int cmd_stripspace(int argc, char **argv, opt_desc &opt) { std::cout << "stub" << std::endl; return 1; }
 }
+
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_SUFFIX
+#endif
 
 #endif

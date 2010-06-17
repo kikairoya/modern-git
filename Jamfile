@@ -66,6 +66,7 @@ project mgit
       <toolset>gcc,<toolset-gcc:flavor>cygwin:<target-os>cygwin
       <target-os>windows,<toolset>gcc,<address-model>64:<link>static
       <target-os>windows,<toolset>gcc,<address-model>64:<runtime-link>static
+      <link>shared:<define>MGIT_DYN_LINK=1
       <link>shared:<define>BOOST_TEST_DYN_LINK=1
       <target-os>cygwin:<linkflags>-liconv
       <target-os>solaris:<linkflags>-liconv
@@ -79,6 +80,7 @@ project mgit
       <include>.
     : usage-requirements
       <define>BOOST_TEST_NO_AUTO_LINK=1
+      <link>shared:<define>MGIT_DYN_LINK=1
     : build-dir bin
     : default-build
       <address-model>32
@@ -94,6 +96,7 @@ lib gitobjs
     <library>/boost/system//boost_system
     <library>/boost/program_options//boost_program_options
     <toolset>gcc:<c++-template-depth>200
+    <link>shared:<define>MGIT_SOURCE=1
     :
     ;
 

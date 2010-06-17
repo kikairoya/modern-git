@@ -3,6 +3,10 @@
 
 #include "git-compat-util.hpp"
 
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_PREFIX
+#endif
+
 namespace mgit {
 	/// Config file type
 	enum config_level {
@@ -28,11 +32,16 @@ namespace mgit {
 	};
 	typedef variant<ustring, intmax_t, int, double, bool> git_config_value;
 	typedef map<git_config_name, git_config_value> git_config_map;
-	git_config_map read_config_file(const ustring &cfgfile);
+	MGIT_DECL git_config_map read_config_file(const ustring &cfgfile);
 	std::ostream &operator <<(std::ostream &os, const git_config_map::value_type &v);
 	std::ostream &operator <<(std::ostream &os, const git_config_map &v);
 
 	typedef git_config_value (*convert_fn)(const std::string &value);
 	typedef map<std::string, convert_fn> convert_table_type;
 }
+
+#ifdef BOOST_HAS_ABI_HEADERS
+	#include BOOST_ABI_SUFFIX
+#endif
+
 #endif
