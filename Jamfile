@@ -86,24 +86,21 @@ project mgit
       <address-model>32
     ;
 
-
 lib gitobjs
     :
     [ path.glob . : *.cc : modern-git.cc ]
     [ path.glob builtin : *.cc ]
     :
     <conditional>@select-platform-obj
-    <library>/boost/system//boost_system
-    <library>/boost/program_options//boost_program_options
     <toolset>gcc:<c++-template-depth>200
     <link>shared:<define>MGIT_SOURCE=1
-    :
     ;
+explicit gitobjs ;
+alias sgitobjs : gitobjs : <link>static ;
 
 exe git
     :
-    modern-git.cc
-    gitobjs
+    modern-git.cc sgitobjs
     :
     <library>/boost/system//boost_system
     <library>/boost/program_options//boost_program_options
@@ -117,12 +114,13 @@ for name in $(test_names)
     local input-files ;
     if $(name) = config_test { input-files += test.cfg ; }
     run testsuite/$(name).cc
-        gitobjs
+        sgitobjs
         :
         :
         $(input-files)
         :
         <library>/boost/system//boost_system
+        <library>/boost/program_options//boost_program_options
         <library>/boost/test//boost_unit_test_framework
         :
         $(name)
