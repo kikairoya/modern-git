@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(config_test) {
 		);
 		BOOST_CHECK_EQUAL(
 			m[mgit::git_config_name("other2", "subsec", "cfg")],
-			mgit::git_config_value(mgit::ustring("value"))
+			mgit::git_config_value(mgit::ustring("va lue"))
 		);
 	}
 }

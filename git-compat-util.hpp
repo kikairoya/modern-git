@@ -10,9 +10,13 @@
 #include <list>
 #include <sstream>
 #include <algorithm>
+#include <boost/utility.hpp>
+#include <boost/swap.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/variant.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/optional.hpp>
+#include <boost/exception/all.hpp>
 
 #ifdef BOOST_HAS_ABI_HEADERS
 	#include BOOST_ABI_PREFIX
@@ -40,8 +44,31 @@ namespace mgit {
 	using std::stringstream;
 	using boost::lexical_cast;
 	using boost::variant;
+	using boost::optional;
+	using boost::none;
 	using boost::intmax_t;
 	using boost::uintmax_t;
+
+	class MGIT_DECL git_exception: public boost::exception, public std::exception { };
+	typedef boost::error_info<struct tag_errno, int> errno_info;
+	typedef boost::error_info<struct tag_errmsg, std::string> errmsg_info;
+
+	template <typename To, typename From>
+	inline optional<To> implicit_lexical_cast(const From &f) {
+		try {
+			return lexical_cast<To>(f);
+		} catch (const boost::bad_lexical_cast &) {
+			return none;
+		}
+	}
+	template <typename To, typename From>
+	inline To implicit_lexical_cast(const From &f, const To &defval = To()) {
+		try {
+			return lexical_cast<To>(f);
+		} catch (const boost::bad_lexical_cast &) {
+			return defval;
+		}
+	}
 
 	enum encoding {
 		enc_host_native,
