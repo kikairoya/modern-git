@@ -177,11 +177,11 @@ namespace mgit {
 	};
 
 	template <typename T, size_t N>
-	T *array_begin(T (&a)[N]) { return a; }
+	inline T *array_begin(T (&a)[N]) { return a; }
 	template <typename T, size_t N>
-	T *array_end(T (&a)[N]) { return a+N; }
+	inline T *array_end(T (&a)[N]) { return a+N; }
 
-	bool filemode_trustable();
+	MGIT_DECL bool filemode_trustable();
 }
 
 namespace std {

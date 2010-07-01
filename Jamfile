@@ -58,6 +58,17 @@ rule check-home-env-enable ( properties * )
     }
 }
 
+rule gcc-cygwin-450-test-workaround ( properties * ) {
+    local link = [ feature.get-values link : $(properties) ] ;
+    local variant = [ feature.get-values variant : $(properties) ] ;
+    local gcc-ver = [ MATCH "^<toolset-gcc:version>([0-9]+.[0-9]+)[.]" : $(properties) ] ;
+    local targ = [ feature.get-values target-os : $(properties) ] ;
+    if $(link) = shared && $(variant) = debug && $(targ) = cygwin && $(gcc-ver) && $(gcc-ver) = 4.5 {
+        echo enabling workaround for gcc-cygwin-4.5 broken unit-test dll. ;
+        return <define>MGIT_TEST_WITH_HEADERS=1 ;
+    }
+}
+
 project mgit
     : requirements
       <toolset>msvc:<target-os>windows
@@ -76,6 +87,7 @@ project mgit
       <conditional>@check-wstring
       <conditional>@select-path-sep
       <conditional>@check-home-env-enable
+      <conditional>@gcc-cygwin-450-test-workaround
       <define>BOOST_ALL_NO_LIB=1
       <include>.
     : usage-requirements
@@ -88,22 +100,20 @@ project mgit
 
 lib gitobjs
     :
-    [ path.glob . : *.cc : modern-git.cc ]
+    [ path.glob . : *.cc : mgitmain.cc ]
     [ path.glob builtin : *.cc ]
     :
     <conditional>@select-platform-obj
     <toolset>gcc:<c++-template-depth>200
     <link>shared:<define>MGIT_SOURCE=1
+    <library>/boost/system//boost_system
+    <library>/boost/program_options//boost_program_options
     ;
-explicit gitobjs ;
-alias sgitobjs : gitobjs : <link>static ;
 
 exe git
     :
-    modern-git.cc sgitobjs
+    mgitmain.cc gitobjs
     :
-    <library>/boost/system//boost_system
-    <library>/boost/program_options//boost_program_options
     ;
 
 
@@ -114,13 +124,11 @@ for name in $(test_names)
     local input-files ;
     if $(name) = config_test { input-files += test.cfg ; }
     run testsuite/$(name).cc
-        sgitobjs
+        gitobjs
         :
         :
         $(input-files)
         :
-        <library>/boost/system//boost_system
-        <library>/boost/program_options//boost_program_options
         <library>/boost/test//boost_unit_test_framework
         :
         $(name)

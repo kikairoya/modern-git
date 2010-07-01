@@ -161,7 +161,7 @@ namespace mgit {
 			std::string arg;
 		};
 	}
-	int main(int argc, char **argv) {
+	MGIT_DECL int main(int argc, char **argv) {
 		opt_desc general_option("General Option");
 		general_option.add_options()
 			("version", "print version information")
@@ -254,11 +254,3 @@ namespace mgit {
 	}
 }
 
-int main(int argc, char **argv) {
-	try {
-		return mgit::main(argc, argv);
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		return 127;
-	}
-}

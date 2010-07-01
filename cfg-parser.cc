@@ -18,24 +18,26 @@ BOOST_FUSION_ADAPT_STRUCT(section_header_t, (std::string, sec)(std::string, sub)
 struct section_t { section_header_t head; std::vector<value_pair_t> values; };
 BOOST_FUSION_ADAPT_STRUCT(section_t, (section_header_t, head)(std::vector<value_pair_t>, values));
 
-std::ostream &operator <<(std::ostream &os, const value_pair_t &val) {
-	return os << val.name << '=' << val.value;
-}
-std::ostream &operator <<(std::ostream &os, const std::vector<value_pair_t> &values) {
-	BOOST_FOREACH (const value_pair_t &v, values) { os << v << '\n'; }
-	return os;
-}
-std::ostream &operator <<(std::ostream &os, const section_header_t &head) {
-	os << head.sec;
-	if (!head.sub.empty()) os << ' ' << '"' << head.sub << '"';
-	return os;
-}
-std::ostream &operator <<(std::ostream &os, const section_t &sec) {
-	return os << '[' << sec.head << ']' << '\n' << sec.values << '\n';
-}
-std::ostream &operator <<(std::ostream &os, const std::vector<section_t> &vsec) {
-	BOOST_FOREACH (const section_t &v, vsec) { os << v << '\n'; }
-	return os;
+namespace {
+	std::ostream &operator <<(std::ostream &os, const value_pair_t &val) {
+		return os << val.name << '=' << val.value;
+	}
+	std::ostream &operator <<(std::ostream &os, const std::vector<value_pair_t> &values) {
+		BOOST_FOREACH (const value_pair_t &v, values) { os << v << '\n'; }
+		return os;
+	}
+	std::ostream &operator <<(std::ostream &os, const section_header_t &head) {
+		os << head.sec;
+		if (!head.sub.empty()) os << ' ' << '"' << head.sub << '"';
+		return os;
+	}
+	std::ostream &operator <<(std::ostream &os, const section_t &sec) {
+		return os << '[' << sec.head << ']' << '\n' << sec.values << '\n';
+	}
+	std::ostream &operator <<(std::ostream &os, const std::vector<section_t> &vsec) {
+		BOOST_FOREACH (const section_t &v, vsec) { os << v << '\n'; }
+		return os;
+	}
 }
 
 namespace mgit {
@@ -136,18 +138,19 @@ namespace mgit {
 		return os;
 	}
 
-
-	git_config_value convert_cfg(const std::string &name, const std::string &value) {
-		extern const convert_table_type convert_table;
-		convert_table_type::const_iterator p = convert_table.find(name);
-		return p==convert_table.end() ? value : p->second(value);
-	}
-	void build_config_map(git_config_map &cfg, const std::vector<section_t> &sects) {
-		BOOST_FOREACH (const section_t &s, sects) {
-			BOOST_FOREACH (const value_pair_t &v, s.values) {
-				const std::string n = s.head.sec + (s.head.sub.empty() ? "." : ".*.") + v.name;
-				const git_config_name h(s.head.sec, s.head.sub, v.name);
-				cfg.insert(std::make_pair(h, convert_cfg(n, v.value)));
+	extern const convert_table_type convert_table;
+	namespace {
+		git_config_value convert_cfg(const std::string &name, const std::string &value) {
+			convert_table_type::const_iterator p = convert_table.find(name);
+			return p==convert_table.end() ? value : p->second(value);
+		}
+		void build_config_map(git_config_map &cfg, const std::vector<section_t> &sects) {
+			BOOST_FOREACH (const section_t &s, sects) {
+				BOOST_FOREACH (const value_pair_t &v, s.values) {
+					const std::string n = s.head.sec + (s.head.sub.empty() ? "." : ".*.") + v.name;
+					const git_config_name h(s.head.sec, s.head.sub, v.name);
+					cfg.insert(std::make_pair(h, convert_cfg(n, v.value)));
+				}
 			}
 		}
 	}

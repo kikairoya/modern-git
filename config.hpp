@@ -15,9 +15,9 @@ namespace mgit {
 		system_wide_config,
 	};
 	/// Get config file name.
-	ustring get_config_file_name(config_level level);
+	MGIT_DECL ustring get_config_file_name(config_level level);
 
-	void merge_from_environment();
+	MGIT_DECL void merge_from_environment();
 
 	struct git_config_name {
 		const ustring section;
@@ -33,8 +33,8 @@ namespace mgit {
 	typedef variant<ustring, intmax_t, int, double, bool> git_config_value;
 	typedef map<git_config_name, git_config_value> git_config_map;
 	MGIT_DECL git_config_map read_config_file(const ustring &cfgfile);
-	std::ostream &operator <<(std::ostream &os, const git_config_map::value_type &v);
-	std::ostream &operator <<(std::ostream &os, const git_config_map &v);
+	MGIT_DECL std::ostream &operator <<(std::ostream &os, const git_config_map::value_type &v);
+	MGIT_DECL std::ostream &operator <<(std::ostream &os, const git_config_map &v);
 
 	typedef git_config_value (*convert_fn)(const std::string &value);
 	typedef map<std::string, convert_fn> convert_table_type;
