@@ -6,4 +6,7 @@
 *.exe
 *.exe.stackdump
 *~
+*.patch
+*.orig
+*.rej
 bin/
