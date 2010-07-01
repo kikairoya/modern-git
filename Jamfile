@@ -87,7 +87,6 @@ project mgit
       <conditional>@check-wstring
       <conditional>@select-path-sep
       <conditional>@check-home-env-enable
-      <conditional>@gcc-cygwin-450-test-workaround
       <define>BOOST_ALL_NO_LIB=1
       <include>.
     : usage-requirements
@@ -129,6 +128,7 @@ for name in $(test_names)
         :
         $(input-files)
         :
+        <conditional>@gcc-cygwin-450-test-workaround
         <library>/boost/test//boost_unit_test_framework
         :
         $(name)
