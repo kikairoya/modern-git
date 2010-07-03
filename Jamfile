@@ -61,10 +61,10 @@ rule check-home-env-enable ( properties * )
 rule gcc-cygwin-450-test-workaround ( properties * ) {
     local link = [ feature.get-values link : $(properties) ] ;
     local variant = [ feature.get-values variant : $(properties) ] ;
-    local gcc-ver = [ MATCH "^<toolset-gcc:version>([0-9]+.[0-9]+)[.]" : $(properties) ] ;
+    local gcc-ver = [ MATCH "^<toolset-gcc:version>([0-9].[0-9].[0-9])" : $(properties) ] ;
     local targ = [ feature.get-values target-os : $(properties) ] ;
-    if $(link) = shared && $(variant) = debug && $(targ) = cygwin && $(gcc-ver) && $(gcc-ver) = 4.5 {
-        echo enabling workaround for gcc-cygwin-4.5 broken unit-test dll. ;
+    if $(link) = shared && $(variant) = debug && $(targ) = cygwin && $(gcc-ver) && $(gcc-ver) = 4.5.0 {
+        echo enabling workaround for gcc-cygwin-4.5.0 broken unit-test dll. ;
         return <define>MGIT_TEST_WITH_HEADERS=1 ;
     }
 }
