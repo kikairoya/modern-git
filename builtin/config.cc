@@ -17,7 +17,8 @@ namespace mgit {
 
 		if (vm.count("help") || !vm.count("cfg")) return print_usage("git config <cfgfile>");
 
-		std::cout << read_config_file(vm["cfg"].as<std::string>()) << std::endl;
+		//std::cout << read_config_file(vm["cfg"].as<std::string>()) << std::endl;
+		write_config_file(vm["cfg"].as<std::string>() + ".new", read_config_file(vm["cfg"].as<std::string>()));
 		return 0;
 	}
 
@@ -37,17 +38,24 @@ namespace mgit {
 		}
 		//git_config_value convert_cfg_to_symbol(const std::string &value) { return git_config_value(value); }
 
+		using boost::get;
+		std::string convert_cfg_from_bool(const git_config_value &value) { return get<bool>(value) ? "true" : "false"; }
+		std::string convert_cfg_from_int(const git_config_value &value) { return lexical_cast<std::string>(get<int>(value)); }
+		std::string convert_cfg_from_long(const git_config_value &value) { return lexical_cast<std::string>(get<intmax_t>(value)); }
+		std::string convert_cfg_from_double(const git_config_value &value) { return lexical_cast<std::string>(get<double>(value)); }
+		std::string convert_cfg_from_string(const git_config_value &value) { return "\"" + get<ustring>(value).a_str() + "\""; }
+
 		const struct convert_table_primitive {
 			std::string name;
-			git_config_value (*fn)(const std::string &value);
-			operator convert_table_type::value_type() const { return std::make_pair(name, fn); }
+			config_data_converter cvt;
+			operator convert_table_type::value_type() const { return std::make_pair(name, cvt); }
 		} convert_table_def[] = {
-#define bool_ &convert_cfg_to_bool
-#define int_ &convert_cfg_to_int
-#define long_ &convert_cfg_to_long
-#define double_ &convert_cfg_to_double
-#define string_ &convert_cfg_to_string
-#define symbol_ &convert_cfg_to_symbol
+#define bool_ { &convert_cfg_to_bool, &convert_cfg_from_bool }
+#define int_ { &convert_cfg_to_int, &convert_cfg_from_int }
+#define long_ { &convert_cfg_to_long, &convert_cfg_from_long }
+#define double_ { &convert_cfg_to_double, &convert_cfg_from_double }
+#define string_ { &convert_cfg_to_string, &convert_cfg_from_string }
+#define symbol_ { &convert_cfg_to_symbol, &convert_cfg_from_symbol }
 			{ "core.fileMode", bool_ },
 			{ "core.ignoreCygwinFSTricks", bool_ },
 			{ "core.ignorecase", bool_ },
@@ -87,7 +95,14 @@ namespace mgit {
 #undef int_
 #undef bool_
 		};
+		struct force_converter: boost::static_visitor<std::string> {
+			std::string operator ()(const ustring &s) { return s.a_str(); }
+			
+		};
+		std::string force_convert_cfg_from_string(const git_config_value &value) {
+		}
 	}
 	extern const convert_table_type convert_table;
 	const convert_table_type convert_table(array_begin(convert_table_def), array_end(convert_table_def));
+	const config_data_converter default_converter = { &convert_cfg_to_string, &convert_cfg_from_string };
 }

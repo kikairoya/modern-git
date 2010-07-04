@@ -1,6 +1,7 @@
 #include "config.hpp"
 #define BOOST_TEST_MODULE config
 #include "unittest.hpp"
+#include <sstream>
 
 BOOST_AUTO_TEST_CASE(config_test) {
 	{
@@ -30,6 +31,21 @@ BOOST_AUTO_TEST_CASE(config_test) {
 		BOOST_CHECK_EQUAL(
 			m[mgit::git_config_name("other2", "subsec", "cfg")],
 			mgit::git_config_value(mgit::ustring("va lue"))
+		);
+
+		std::stringstream ss;
+		mgit::write_config_file(ss, m);
+
+		BOOST_CHECK_EQUAL(
+			ss.str(),
+			"[core]\n"
+			"	editor = \"vi\"\n"
+			"	ignorecase = true\n"
+			"	repositoryFormatVersion = 0\n"
+			"[other.subsec]\n"
+			"	cfg = \"value\"\n"
+			"[other2.subsec]\n"
+			"	cfg = \"va lue\"\n"
 		);
 	}
 }

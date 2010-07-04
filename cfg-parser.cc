@@ -214,28 +214,16 @@ namespace mgit {
 		}
 	}
 
-	std::ostream &operator <<(std::ostream &os, const git_config_map::value_type &v) {
-		os << v.first.section << '.';
-		if (!v.first.subsection.empty()) os << v.first.subsection << '.';
-		return os << v.first.name << '=' << v.second;
-	}
-	std::ostream &operator <<(std::ostream &os, const git_config_map &v) {
-		BOOST_FOREACH (git_config_map::value_type vv, v) { os << vv << '\n'; }
-		return os;
-	}
-
 	extern const convert_table_type convert_table;
 	namespace {
 		git_config_value convert_cfg(const std::string &name, const std::string &value) {
-			convert_table_type::const_iterator p = convert_table.find(name);
-			return p==convert_table.end() ? value : p->second(value);
+			return map_at_or(convert_table, name, default_converter).reader(value);
 		}
 		void build_config_map(git_config_map &cfg, const std::vector<parser::section_t> &sects) {
 			BOOST_FOREACH (const parser::section_t &s, sects) {
 				BOOST_FOREACH (const parser::value_pair_t &v, s.values) {
-					const std::string n = s.head.sec + (s.head.sub.empty() ? "." : ".*.") + v.name;
 					const git_config_name h(s.head.sec, s.head.sub, v.name);
-					cfg.insert(std::make_pair(h, convert_cfg(n, v.value)));
+					if (!h.empty()) cfg.insert(std::make_pair(h, convert_cfg(h.get_key_str(), v.value)));
 				}
 			}
 		}

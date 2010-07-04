@@ -10,6 +10,7 @@
 #include <list>
 #include <sstream>
 #include <algorithm>
+#include <assert.h>
 #include <boost/utility.hpp>
 #include <boost/swap.hpp>
 #include <boost/lexical_cast.hpp>
@@ -68,6 +69,12 @@ namespace mgit {
 		} catch (const boost::bad_lexical_cast &) {
 			return defval;
 		}
+	}
+
+	template <typename Key, typename T, typename Comp>
+	inline const T &map_at_or(const std::map<Key, T, Comp> &m, const Key &k, const T &v) {
+		typename std::map<Key, T, Comp>::const_iterator p = m.find(k);
+		return p==m.end() ? v : p->second;
 	}
 
 	enum encoding {
